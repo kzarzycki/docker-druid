@@ -1,6 +1,6 @@
 FROM java:jre
 
-ENV DRUID_VER 0.6.160
+ENV DRUID_VER 0.6.165
 
 WORKDIR /druid
 
