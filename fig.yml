@@ -7,7 +7,7 @@ mysql:
     - MYSQL_DATABASE=druid
 
 zk:
-  image: nomi/zookeeper
+  image: darren/zookeeper
 
 coordinator:
   build: .
