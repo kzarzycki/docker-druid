@@ -1,0 +1,49 @@
+mysql:
+  image: mysql:latest
+  environment:
+    - MYSQL_ROOT_PASSWORD=doesntreallymatter
+    - MYSQL_USER=druid
+    - MYSQL_PASSWORD=diurd
+    - MYSQL_DATABASE=druid
+
+zk:
+  image: nomi/zookeeper
+
+coordinator:
+  build: .
+  command: coordinator
+  links:
+    - zk:zk
+    - mysql:msql
+
+historical:
+  build: .
+  command: historical
+  links:
+    - zk:zk
+    - mysql:msql
+
+broker:
+  build: .
+  command: broker
+  links:
+    - zk:zk
+    - mysql:msql
+
+realtime:
+  build: .
+  command: realtime
+  links:
+    - zk:zk
+    - mysql:msql
+
+overlord:
+  build: .
+  command: overlord
+  links:
+    - zk:zk
+    - mysql:msql
+  ports:
+    - 8080:8000
+  environment:
+    - JAVA_MEMORY=5g
