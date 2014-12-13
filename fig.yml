@@ -14,36 +14,38 @@ coordinator:
   command: coordinator
   links:
     - zk:zk
-    - mysql:msql
+    - mysql:mysql
+  ports:
+    - 8000
 
 historical:
   build: .
   command: historical
   links:
     - zk:zk
-    - mysql:msql
 
 broker:
   build: .
   command: broker
+  ports:
+    - 8000
   links:
     - zk:zk
-    - mysql:msql
 
 realtime:
   build: .
   command: realtime
   links:
     - zk:zk
-    - mysql:msql
+    - mysql:mysql
 
-overlord:
-  build: .
-  command: overlord
-  links:
-    - zk:zk
-    - mysql:msql
-  ports:
-    - 8080:8000
+#overlord:
+#  build: .
+#  command: overlord
+#  links:
+#    - zk:zk
+#    - mysql:mysql
+#  ports:
+#    - 8000
 #  environment:
 #    - JAVA_MEMORY=5g

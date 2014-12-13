@@ -4,9 +4,8 @@ set -x
 DRUID_ROLE=${1:-"coordinator"}
 MEMORY=${JAVA_MEMORY:-"768m"}
 
-if env | grep -q MSQL_PORT_3306_TCP_ADDR; then
-  sed -i "s/localhost\:3306/$MSQL_PORT_3306_TCP_ADDR\:3306/g" /druid/config/$DRUID_ROLE/runtime.properties
-  sed -i "s/localhost\\\:3306/$MSQL_PORT_3306_TCP_ADDR\\\:3306/g" /druid/config/$DRUID_ROLE/runtime.properties
+if env | grep -q MYSQL_PORT_3306_TCP_ADDR; then
+  sed -i "s/druid.db.connector.connectURI=.*/druid.db.connector.connectURI=jdbc\\\:mysql\\\:\/\/$MYSQL_PORT_3306_TCP_ADDR\\\:3306\/druid/g" /druid/config/$DRUID_ROLE/runtime.properties
   sed -i 's/\# druid.db.connector/druid.db.connector/g' /druid/config/$DRUID_ROLE/runtime.properties
 fi
 
