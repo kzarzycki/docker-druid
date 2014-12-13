@@ -45,5 +45,5 @@ overlord:
     - mysql:msql
   ports:
     - 8080:8000
-  environment:
-    - JAVA_MEMORY=5g
+#  environment:
+#    - JAVA_MEMORY=5g
