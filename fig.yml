@@ -23,6 +23,12 @@ historical:
   command: historical
   links:
     - zk:zk
+  ports:
+    - 8000
+  environment:
+    - s3_access_key=
+    - s3_secret_key=
+    - s3_bucket=nomi-druid-dev
 
 broker:
   build: .

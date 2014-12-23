@@ -8,28 +8,40 @@ EXAMPLE_SPEC=${EXAMPLE:-"wikipedia"}
 SPEC="/druid/examples/${EXAMPLE_SPEC}/${EXAMPLE_SPEC}_realtime.spec"
 IP=$(ip addr | grep 'eth0' | awk '{print $2}' | cut -f1  -d'/' | tail -1)
 
-druid_config(){
+druid_config_alter(){
   sed -i "$1" /druid/config/$DRUID_NODE_TYPE/runtime.properties
 }
 
+druid_config_add(){
+  echo -e "\n$1" >> /druid/config/$DRUID_NODE_TYPE/runtime.properties
+}
+
 if env | grep -q MYSQL_PORT_3306_TCP_ADDR; then
-  druid_config "s/druid.db.connector.connectURI=.*/druid.db.connector.connectURI=jdbc\\\:mysql\\\:\/\/$MYSQL_PORT_3306_TCP_ADDR\\\:3306\/druid/g"
-  druid_config 's/\# druid.db.connector/druid.db.connector/g'
+  druid_config_alter "s/druid.db.connector.connectURI=.*/druid.db.connector.connectURI=jdbc\\\:mysql\\\:\/\/$MYSQL_PORT_3306_TCP_ADDR\\\:3306\/druid/g"
+  druid_config_alter 's/\# druid.db.connector/druid.db.connector/g'
 fi
 
 if env | grep -q ZK_PORT_2181_TCP_ADDR; then
-  druid_config "s/druid.zk.service.host=localhost/druid.zk.service.host=$ZK_PORT_2181_TCP_ADDR/g"
+  druid_config_alter "s/druid.zk.service.host=localhost/druid.zk.service.host=$ZK_PORT_2181_TCP_ADDR/g"
+  druid_config_add "druid.zk.paths.base=druid"
+fi
+
+if  env | grep -q s3_access_key && env | grep -q s3_secret_key; then
+  druid_config_alter "s/druid.s3.secretKey.*/druid.s3.secretKey=$s3_secret_key/g"
+  druid_config_alter "s/druid.s3.accessKey.*/druid.s3.accessKey=$s3_access_key/g"
+  druid_config_add "druid.storage.bucket=$s3_bucket"
+  druid_config_add "druid.storage.type=s3"
 fi
 
 # Standardize port to 8000
-druid_config 's/druid.port=.*/druid.port=8000/g'
+druid_config_alter 's/druid.port=.*/druid.port=8000/g'
 
 # Set specific hostname
-druid_config "s/druid.host=.*/druid.host=$IP/g"
+druid_config_alter "s/druid.host=.*/druid.host=$IP/g"
 
 if [ "$DRUID_NODE_TYPE" = "realtime" ]; then
-  druid_config "s/druid.publish.type=.*/druid.publish.type=db/g"
-  echo "druid.realtime.specFile=$SPEC" >> /druid/config/$DRUID_NODE_TYPE/runtime.properties
+  druid_config_alter "s/druid.publish.type=.*/druid.publish.type=db/g"
+  druid_config_add "druid.realtime.specFile=$SPEC"
 fi
 
 cat /druid/config/$DRUID_NODE_TYPE/runtime.properties
