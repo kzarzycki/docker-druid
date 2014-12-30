@@ -27,8 +27,8 @@ if env | grep -q ZK_PORT_2181_TCP_ADDR; then
 fi
 
 if  env | grep -q s3_access_key && env | grep -q s3_secret_key; then
-  druid_config_alter "s/druid.s3.secretKey.*/druid.s3.secretKey=$s3_secret_key/g"
-  druid_config_alter "s/druid.s3.accessKey.*/druid.s3.accessKey=$s3_access_key/g"
+  druid_config_alter "s@druid.s3.secretKey.*@druid.s3.secretKey=$s3_secret_key@g"
+  druid_config_alter "s@druid.s3.accessKey.*@druid.s3.accessKey=$s3_access_key@g"
   druid_config_add "druid.storage.bucket=$s3_bucket"
   druid_config_add "druid.storage.type=s3"
 fi
@@ -42,6 +42,16 @@ druid_config_alter "s/druid.host=.*/druid.host=$IP/g"
 if [ "$DRUID_NODE_TYPE" = "realtime" ]; then
   druid_config_alter "s/druid.publish.type=.*/druid.publish.type=db/g"
   druid_config_add "druid.realtime.specFile=$SPEC"
+
+  if  env | grep -q s3_access_key && env | grep -q s3_secret_key; then
+    druid_config_alter "s/rabbitmq/s3/g" # Change the extension
+    druid_config_add "druid.s3.secretKey=$s3_secret_key"
+    druid_config_add "druid.s3.accessKey=$s3_access_key"
+    druid_config_add "druid.storage.bucket=$s3_bucket"
+    druid_config_add "druid.storage.type=s3"
+  fi
+
+
 fi
 
 cat /druid/config/$DRUID_NODE_TYPE/runtime.properties
