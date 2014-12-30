@@ -48,7 +48,6 @@ if [ "$DRUID_NODE_TYPE" = "realtime" ]; then
     druid_config_add "druid.s3.secretKey=$s3_secret_key"
     druid_config_add "druid.s3.accessKey=$s3_access_key"
     druid_config_add "druid.storage.bucket=$s3_bucket"
-    druid_config_add "druid.storage.type=s3"
   fi
 
 
